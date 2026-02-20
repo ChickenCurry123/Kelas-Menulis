@@ -3,13 +3,13 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-  useScroll,
-} from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const projects = [
   { title: "Jeda", category: "kumpulan cerita dan prosa", src: "jeda 1.jpg", color: "#EFEFEF" },
@@ -20,22 +20,48 @@ const projects = [
 
 export default function RecentWork() {
   const [modal, setModal] = useState({ active: false, index: 0 });
-  const targetRef = useRef(null);
 
-  const { scrollYProgress } = useScroll({
-    target: targetRef,
-    offset: ["start start", "end end"],
-  });
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
 
-  // Digeser sedikit agar tidak langsung mentok kiri di awal
-  const x = useTransform(scrollYProgress, [0, 1], ["5%", "-70%"]);
+  /* ========================= GSAP SCROLL LOCK ========================= */
 
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const arrowOpacity = useTransform(scrollYProgress, [0.8, 0.95], [0, 1]);
+useEffect(() => {
+  if (!sectionRef.current || !trackRef.current) return;
+
+  const ctx = gsap.context(() => {
+    const totalWidth = trackRef.current!.scrollWidth;
+    const viewportWidth = window.innerWidth;
+
+    // jarak horizontal asli
+    const horizontalDistance = totalWidth - viewportWidth;
+
+    // tambahkan buffer supaya tidak naik duluan
+    const scrollDistance = horizontalDistance + window.innerHeight;
+
+    gsap.to(trackRef.current, {
+      x: -horizontalDistance,
+      ease: "none",
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top top",
+        end: () => `+=${scrollDistance}`, // 🔥 lebih panjang
+        scrub: 1,
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+      },
+    });
+  }, sectionRef);
+
+  return () => ctx.revert();
+}, []);
+
+  /* ========================= CURSOR FLOATING ========================= */
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-
   const smoothX = useSpring(mouseX, { stiffness: 120, damping: 30 });
   const smoothY = useSpring(mouseY, { stiffness: 120, damping: 30 });
 
@@ -46,25 +72,21 @@ export default function RecentWork() {
     };
     window.addEventListener("mousemove", moveMouse);
     return () => window.removeEventListener("mousemove", moveMouse);
-  }, [mouseX, mouseY]);
+  }, []);
 
   return (
-    <motion.section 
-      ref={targetRef} 
-      /* PENTING: Tinggi ditambah ke 250vh agar scroll lebih awet dan lega.
-         pt-[15vh] memberikan jarak dari section WORK di atasnya.
-      */
-      className="relative h-[140vh] bg-[#f2f2f2]"  
+    <section
+      ref={sectionRef}
+      className="relative h-screen bg-[#f2f2f2] overflow-hidden"
     >
-      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
-        
+      <div className="flex h-screen items-center overflow-hidden">
+
         {/* WATERMARK */}
-        <motion.div 
-          style={{ opacity }}
-          className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
-        >
-          <h2 className="text-[30vw] font-black uppercase text-black/[0.03]">Work</h2>
-        </motion.div>
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+          <h2 className="text-[30vw] font-black uppercase text-black/[0.03]">
+            Work
+          </h2>
+        </div>
 
         {/* TITLE */}
         <div className="absolute top-24 left-12 z-20">
@@ -73,8 +95,11 @@ export default function RecentWork() {
           </span>
         </div>
 
-        {/* GALLERY */}
-        <motion.div style={{ x }} className="flex gap-24 pl-[10vw] pr-[20vw] items-center relative z-10">
+        {/* HORIZONTAL TRACK */}
+        <div
+          ref={trackRef}
+          className="flex gap-24 pl-[10vw] pr-[20vw] items-center relative z-10"
+        >
           {projects.map((project, index) => (
             <Link
               href="/work"
@@ -104,46 +129,51 @@ export default function RecentWork() {
               </div>
             </Link>
           ))}
-
-          <motion.div
-            style={{ opacity: arrowOpacity }}
-            className="flex flex-col items-center justify-center min-w-[300px]"
-          >
-            <p className="text-[9px] font-bold tracking-[0.5em] uppercase text-black/20 mb-8">
-              Selengkapnya
-            </p>
-            <div className="w-12 h-[1px] bg-black/20" />
-          </motion.div>
-        </motion.div>
+        </div>
       </div>
 
-      {/* FLOATING PREVIEW & CURSOR (Tetap Sama) */}
-      {/* ... bagian modal dan cursor tidak berubah ... */}
+      {/* FLOATING PREVIEW */}
       <motion.div
         style={{ left: smoothX, top: smoothY }}
         initial={{ scale: 0, x: "-50%", y: "-50%" }}
-        animate={{ scale: modal.active ? 1 : 0, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } }}
+        animate={{ scale: modal.active ? 1 : 0 }}
+        transition={{ duration: 0.4 }}
         className="pointer-events-none fixed z-50 h-[280px] w-[380px] overflow-hidden rounded-xl shadow-2xl"
       >
-        <div className="relative h-full w-full transition-transform duration-700 ease-[cubic-bezier(0.76,0,0.24,1)]" style={{ transform: `translateY(${modal.index * -100}%)` }}>
+        <div
+          className="relative h-full w-full transition-transform duration-700 ease-[cubic-bezier(0.76,0,0.24,1)]"
+          style={{ transform: `translateY(${modal.index * -100}%)` }}
+        >
           {projects.map((project, i) => (
-            <div key={i} className="flex h-full w-full items-center justify-center" style={{ backgroundColor: project.color }}>
+            <div
+              key={i}
+              className="flex h-full w-full items-center justify-center"
+              style={{ backgroundColor: project.color }}
+            >
               <div className="relative h-[85%] w-[85%]">
-                <Image src={`/${project.src}`} fill alt={project.title} className="object-contain" />
+                <Image
+                  src={`/${project.src}`}
+                  fill
+                  alt={project.title}
+                  className="object-contain"
+                />
               </div>
             </div>
           ))}
         </div>
       </motion.div>
 
+      {/* BULAT LIHAT */}
       <motion.div
         style={{ left: smoothX, top: smoothY }}
         initial={{ scale: 0, x: "-50%", y: "-50%" }}
         animate={{ scale: modal.active ? 1 : 0 }}
         className="pointer-events-none fixed z-[60] flex h-20 w-20 items-center justify-center rounded-full bg-white text-black mix-blend-difference"
       >
-        <span className="text-[10px] font-bold uppercase tracking-widest">Lihat</span>
+        <span className="text-[10px] font-bold uppercase tracking-widest">
+          Lihat
+        </span>
       </motion.div>
-    </motion.section>
+    </section>
   );
 }
