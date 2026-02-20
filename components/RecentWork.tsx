@@ -13,7 +13,7 @@ if (typeof window !== "undefined") {
 
 const projects = [
   { title: "Jeda", category: "kumpulan cerita dan prosa", src: "jeda 1.jpg", color: "#EFEFEF" },
-  { title: "Sementara", category: "kumpulan cerita dan prosa", src: "sementara.jpeg", color: "#8C8C8C" },
+  { title: "Sementara", category: "kumpulan cerita dan prosa", src: "sementara.jpg", color: "#8C8C8C" },
   { title: "Dua Sisi", category: "kumpulan cerita dan prosa", src: "dua sisi.jpg", color: "#1C1D20" },
   { title: "Merasa Cukup", category: "kumpulan cerita dan prosa", src: "buku-merasa-cukup.jpg", color: "#706D63" },
 ];
@@ -177,3 +177,4 @@ useEffect(() => {
     </section>
   );
 }
+
