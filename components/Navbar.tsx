@@ -119,7 +119,7 @@ export default function Navbar() {
           <div className="space-y-6">
             {[
               { title: "Jeda", img: "/jeda.jpg" },
-              { title: "Sementara", img: "/sementara.jpeg" },
+              { title: "Sementara", img: "/sementara.jpg" },
               { title: "Merasa Cukup", img: "/cukup.jpeg" }
             ].map((item, i) => (
               <Link
@@ -242,3 +242,4 @@ export default function Navbar() {
     </nav>
   );
 }
+
