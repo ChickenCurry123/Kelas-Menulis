@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import WorkIntro from "@/components/WorkIntro";
@@ -27,7 +26,6 @@ export default function WorkPage() {
   return (
     <>
       {!introDone && <WorkIntro onFinish={finishIntro} />}
-
       {introDone && <Navbar />}
 
       <main className="min-h-screen bg-[#111] text-white px-8 md:px-20 py-40">
@@ -43,10 +41,9 @@ export default function WorkPage() {
 
         <div className="max-w-7xl mx-auto grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-14">
           {books.map((book) => (
-            <Link
+            <div
               key={book.slug}
-              href={`/work/${book.slug}`}
-              className="group block"
+              className="group block cursor-default"
             >
               <div className="relative w-full aspect-[3/4.5] overflow-hidden rounded-2xl bg-neutral-800">
                 <Image
@@ -66,7 +63,7 @@ export default function WorkPage() {
                   {book.title}
                 </h3>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </main>
