@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+/* Tambahkan ini agar Tailwind menscan folder components */
+@source "../components";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui;
+}
+
+/* --- EFEK TARIK TEKS (SELECTION) --- */
+/* Saat teks ditarik/diblok, background jadi putih dan teks jadi hitam */
+::selection {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important; /* Memastikan teks tetap hitam di beberapa browser */
+}
+
+/* Khusus browser Firefox */
+::-moz-selection {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.text-mask {
+  transition: background-color 0.3s ease;
+}
+
+@layer base {
+  body {
+    background-color: #f1f1f1;
+    color: #0e0e0e;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Sembunyikan scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  
+  html {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+}
+
+@keyframes dragHint {
+  0%,100% { opacity:.25; transform:translateY(0); }
+  50% { opacity:.8; transform:translateY(-4px); }
+}
+
+.drag-hint{
+  animation: dragHint 2.2s ease-in-out infinite;
+}
