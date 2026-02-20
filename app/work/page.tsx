@@ -8,7 +8,7 @@ const books = [
   { slug: "jeda", title: "Jeda", cover: "/jeda.jpg", category: "kumpulan cerita dan prosa" },
   { slug: "sementara", title: "Sementara", cover: "/sementara.jpeg", category: "kumpulan cerita dan prosa" },
   { slug: "merasa-cukup", title: "Merasa Cukup", cover: "/cukup.jpeg", category: "kumpulan cerita dan prosa" },
-  { slug: "rumah", title: "Rumah", cover: "/dua sisi.jpg", category: "kumpulan cerita dan prosa" },
+  { slug: "dua sisi", title: "dua sisi", cover: "/dua sisi.jpg", category: "kumpulan cerita dan prosa" },
 ];
 
 export default function WorkPage() {
@@ -70,3 +70,4 @@ export default function WorkPage() {
     </>
   );
 }
+
